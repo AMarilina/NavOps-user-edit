@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/navops
+    username: postgres
+    password: 2102
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
