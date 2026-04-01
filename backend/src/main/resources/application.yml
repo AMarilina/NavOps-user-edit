@@ -1,10 +1,34 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: navops-api
+  
   datasource:
-    url: jdbc:postgresql://localhost:5433/navops
-    username: postgres
+    url: jdbc:postgresql://localhost:5432/navops
+    # En tu docker-compose, el usuario era navops_user
+    username: navops_user
     password: 2102
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      # Como usamos un script SQL completo (navops.sql) para gestionar la base de datos con triggers, ddl-auto va en validate
+      ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Configuraciones base de CORS para la PWA
+cors:
+  allowed-origins: http://localhost:5173
+
+# Documentación de la API (Swagger)
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

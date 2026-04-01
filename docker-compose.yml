@@ -1,18 +1,20 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15
+  postgres:
+    image: postgres:16
     container_name: navops-db
-    restart: always
     environment:
-      POSTGRES_DB: navops
-      POSTGRES_USER: postgres
+      POSTGRES_USER: navops_user
       POSTGRES_PASSWORD: 2102
+      POSTGRES_DB: navops
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - navops-pgdata:/var/lib/postgresql/data
+      # Instanciación automática del script SQL
+      - "./data base/navops.sql:/docker-entrypoint-initdb.d/navops.sql"
+    restart: always
 
 volumes:
-  postgres_data:
+  navops-pgdata:
