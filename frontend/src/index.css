@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-family: 'Montserrat', sans-serif; /* Montserrat resembles the design more */
+  --transition-speed: 0.2s;
+  --border-radius-md: 6px;
+  --border-radius-lg: 12px;
+  
+  /* Dark Mode */
+  --bg-main: linear-gradient(180deg, #072740 0%, #010a12 100%);
+  --bg-card: #082842;
+  --border-card: #3a617c;
+  --border-input: #3a617c;
+  --text-primary: #ffffff;
+  --text-secondary: #cce5ff;
+  --color-primary: #2095d4;
+  --color-primary-hover: #197bb0;
+  --color-link: #2095d4;
+  --error-color: #ef4444;
+}
+
+[data-theme='light'] {
+  /* Light Mode */
+  --bg-main: #f0f6fa;
+  --bg-card: linear-gradient(180deg, #bce8ff 0%, #ffffff 50%);
+  --border-card: #bce8ff;
+  --border-input: #a1d6f5;
+  --text-primary: #031728;
+  --text-secondary: #082842;
+  --color-primary: #2095d4;
+  --color-primary-hover: #197bb0;
+  --color-link: #2095d4;
+  --error-color: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+#root {
+  display: flex;
+  flex: 1;
+  width: 100%;
+}
