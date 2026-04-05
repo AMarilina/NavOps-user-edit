@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -61,5 +62,26 @@ public class GlobalExceptionHandler {
                 OffsetDateTime.now()
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "Not Found",
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                OffsetDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<?> handleEmailNotFound(EmailNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of(
+                        "error", "Not Found",
+                        "message", ex.getMessage(),
+                        "status", 404
+                ));
     }
 }

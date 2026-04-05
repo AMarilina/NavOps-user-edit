@@ -49,6 +49,7 @@ CREATE TABLE cargo_type (
 CREATE TABLE users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   username varchar(50) NOT NULL UNIQUE,
+  email varchar(150) UNIQUE,
   password_hash varchar(255) NOT NULL,
   is_active boolean NOT NULL DEFAULT true,
   role_id uuid NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
@@ -466,9 +467,8 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Inserción de Usuarios de Prueba (Password: admin123)
 -- NOTA: Utilizamos la extensión pgcrypto para generar hashes de BCrypt compatibles nativamente con Spring Security.
-INSERT INTO users (id, username, password_hash, role_id) VALUES 
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin', crypt('admin123', gen_salt('bf')), '11111111-1111-1111-1111-111111111111'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
+INSERT INTO users (id, username, email, password_hash, role_id) VALUES 
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin', 'admin@navops.com', crypt('admin123', gen_salt('bf')), '11111111-1111-1111-1111-111111111111'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', 'nav@navops.com', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', 'ops@navops.com', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
 ON CONFLICT (username) DO NOTHING;
-

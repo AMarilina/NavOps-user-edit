@@ -4,6 +4,7 @@ import com.navops.api.application.dto.request.LoginRequest;
 import com.navops.api.application.dto.response.LoginResponse;
 import com.navops.api.domain.entity.LoginAttempt;
 import com.navops.api.domain.entity.User;
+import com.navops.api.infrastructure.exception.UserNotFoundException;
 import com.navops.api.repository.LoginAttemptRepository;
 import com.navops.api.repository.UserRepository;
 import com.navops.api.security.JwtService;
@@ -106,5 +107,15 @@ public class AuthService {
             case "CHIEF_OPERATIONS" -> "/dashboard/operations";
             default -> "/";
         };
+    }
+
+    public void forgotPassword(String email) {
+        log.info("Iniciando proceso de recuperación de contraseña para: {}", email);
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        String resetToken = jwtService.generatePasswordResetToken(user);
+        EmailService emailService = new EmailService();
+        emailService.sendPasswordRecoveryEmail(user.getEmail(), resetToken);
+        log.info("Correo enviado al usuario con id: {}", user.getId());
+        log.warn("Intento de recuperación para correo inexistente: {}", email);
     }
 }

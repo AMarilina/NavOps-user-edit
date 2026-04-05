@@ -32,6 +32,9 @@ public class User implements UserDetails {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
+    @Column(unique = true, length = 150)
+    private String email;
+
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 

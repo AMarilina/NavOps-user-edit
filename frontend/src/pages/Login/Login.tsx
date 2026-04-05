@@ -141,7 +141,9 @@ export const Login: React.FC = () => {
             disabled={isLoading}
           />
 
-          <a href="#" className={styles.forgotPassword}>¿Olvidaste tu contraseña?</a>
+          
+          <span className={styles.forgotPassword} onClick={() => navigate('/forgot-password')}
+              style={{ cursor: 'pointer' }}> ¿Olvidaste tu contraseña?</span>
 
           <Button
             type="submit"

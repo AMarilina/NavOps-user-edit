@@ -1,6 +1,8 @@
 package com.navops.api.infrastructure.controller;
 
+import com.navops.api.application.dto.request.ForgotPasswordRequest;
 import com.navops.api.application.dto.request.LoginRequest;
+import com.navops.api.application.dto.response.ForgotPasswordResponse;
 import com.navops.api.application.dto.response.LoginResponse;
 import com.navops.api.application.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,5 +41,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
+    }
+
+    @Operation(summary = "Request password recovery", description = "Generates a reset link and sends it to the registered email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns success universally to prevent email enumeration.")
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ForgotPasswordResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.email());
+        return ResponseEntity.ok(new ForgotPasswordResponse("Se ha enviado un enlace a tu correo electrónico"));
     }
 }
