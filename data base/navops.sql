@@ -73,6 +73,18 @@ CREATE TABLE system_attachments (
   deleted_at timestamp with time zone
 );
 
+CREATE TABLE login_attempts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  username varchar(50) NOT NULL,
+  ip_address varchar(45) NOT NULL,
+  success boolean NOT NULL,
+  attempt_time timestamp with time zone NOT NULL DEFAULT now(),
+  version integer NOT NULL DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  deleted_at timestamp with time zone
+);
+
 -- 3. PERSONAL (PEOPLE y CREW)
 CREATE TABLE people (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -378,6 +390,8 @@ CREATE INDEX idx_cunit_ship_plan ON cargo_unit(ship_id, travel_plan_id);
 CREATE INDEX idx_product_unit ON product(unit_id);
 CREATE INDEX idx_incidents_ship_unresolved ON incidents(ship_id) WHERE is_resolved = false;
 CREATE INDEX idx_notif_user ON notifications(user_id);
+CREATE INDEX idx_log_att_username ON login_attempts(username, attempt_time DESC);
+CREATE INDEX idx_log_att_ip ON login_attempts(ip_address, attempt_time DESC);
 
 -- Custom Queries Indexes
 CREATE INDEX idx_people_document ON people(document_number);
@@ -393,6 +407,7 @@ CREATE INDEX idx_roles_updated_at ON roles(updated_at);
 CREATE INDEX idx_cargo_type_updated_at ON cargo_type(updated_at);
 CREATE INDEX idx_users_updated_at ON users(updated_at);
 CREATE INDEX idx_sysattach_updated_at ON system_attachments(updated_at);
+CREATE INDEX idx_logatt_updated_at ON login_attempts(updated_at);
 CREATE INDEX idx_people_updated_at ON people(updated_at);
 CREATE INDEX idx_crew_updated_at ON crew_members(updated_at);
 CREATE INDEX idx_ships_updated_at ON ships(updated_at);
@@ -419,6 +434,7 @@ CREATE TRIGGER update_roles_modtime BEFORE UPDATE ON roles FOR EACH ROW EXECUTE 
 CREATE TRIGGER update_cargo_type_modtime BEFORE UPDATE ON cargo_type FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_users_modtime BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_sysattach_modtime BEFORE UPDATE ON system_attachments FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
+CREATE TRIGGER update_logatt_modtime BEFORE UPDATE ON login_attempts FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_people_modtime BEFORE UPDATE ON people FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_crew_modtime BEFORE UPDATE ON crew_members FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_ships_modtime BEFORE UPDATE ON ships FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
@@ -455,3 +471,4 @@ INSERT INTO users (id, username, password_hash, role_id) VALUES
   ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
   ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
 ON CONFLICT (username) DO NOTHING;
+

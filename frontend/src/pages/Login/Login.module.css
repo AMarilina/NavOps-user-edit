@@ -1,0 +1,156 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px;
+  position: relative;
+}
+
+.themeToggle {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  background: transparent;
+  border: none;
+  color: #193a53;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme='light'] .themeToggle {
+  color: #031728;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--border-radius-lg);
+  padding: 25px 35px;
+  /* Reducido para compensar altura del logo */
+  width: 100%;
+  max-width: 420px;
+  /* Efecto hacia abajo color #6EC7E8 */
+  box-shadow: 0 35px 50px -20px rgba(110, 199, 232, 0.2);
+}
+
+/* Light mode specific card styles */
+[data-theme='light'] .card {
+  box-shadow: 0 10px 40px rgba(32, 149, 212, 0.1);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 15px;
+  /* Reducido para juntar el form y ganar espacio */
+}
+
+.logoImage {
+  width: auto;
+  height: 140px;
+  /* Logo grande pedido por el usuario */
+  margin: 0 auto;
+  display: block;
+  object-fit: contain;
+  margin-bottom: 0px;
+  /* Eliminado margen para acomodar la tarjeta */
+  transform: scale(2.0);
+  /* Agrandamiento visual que no afecta a la tarjeta */
+}
+
+.logoPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-primary);
+  font-weight: 400;
+}
+
+[data-theme='light'] .subtitle {
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.forgotPassword {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  margin-top: -10px;
+  margin-bottom: 12px;
+}
+
+.googleIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  margin-top: 25px;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+[data-theme='light'] .footer {
+  color: var(--text-secondary);
+}
+
+/* Manejo de Error Global del Formulario */
+.globalError {
+  color: var(--error-color);
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Responsive ajustments */
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 20px;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .themeToggle {
+    top: 15px;
+    right: 15px;
+  }
+
+  .container {
+    background: var(--bg-card);
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
+  .footer {
+    position: relative;
+    margin-top: 40px;
+    bottom: auto;
+  }
+}

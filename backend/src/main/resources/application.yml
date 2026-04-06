@@ -6,7 +6,7 @@ spring:
     name: navops-api
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/navops
+    url: jdbc:postgresql://localhost:5433/navops
     # En tu docker-compose, el usuario era navops_user
     username: navops_user
     password: 2102
