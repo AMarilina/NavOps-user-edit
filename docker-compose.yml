@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: 2102
       POSTGRES_DB: navops
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - navops-pgdata:/var/lib/postgresql/data
       # Instanciación automática del script SQL

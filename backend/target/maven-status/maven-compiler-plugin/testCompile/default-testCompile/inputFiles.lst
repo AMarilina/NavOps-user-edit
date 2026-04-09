@@ -1,0 +1,5 @@
+/home/maxi/Mis Proyectos/NavOps/backend/src/test/java/com/navops/api/MaritimeApiApplicationTests.java
+/home/maxi/Mis Proyectos/NavOps/backend/src/test/java/com/navops/api/application/service/AuthServiceTest.java
+/home/maxi/Mis Proyectos/NavOps/backend/src/test/java/com/navops/api/application/service/EmailServiceTest.java
+/home/maxi/Mis Proyectos/NavOps/backend/src/test/java/com/navops/api/infrastructure/controller/AuthControllerTest.java
+/home/maxi/Mis Proyectos/NavOps/backend/src/test/java/com/navops/api/infrastructure/controller/ForgotPasswordControllerTest.java
