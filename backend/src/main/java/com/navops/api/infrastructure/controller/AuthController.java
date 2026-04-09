@@ -4,6 +4,8 @@ import com.navops.api.application.dto.request.ForgotPasswordRequest;
 import com.navops.api.application.dto.request.LoginRequest;
 import com.navops.api.application.dto.response.ForgotPasswordResponse;
 import com.navops.api.application.dto.response.LoginResponse;
+import com.navops.api.application.dto.request.VerifyCodeRequest;
+import com.navops.api.application.dto.response.VerifyCodeResponse;
 import com.navops.api.application.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.NewFieldTypeMunger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,5 +54,17 @@ public class AuthController {
     public ResponseEntity<ForgotPasswordResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request.email());
         return ResponseEntity.ok(new ForgotPasswordResponse("Se ha enviado un enlace a tu correo electrónico"));
+    }
+
+    @Operation(summary = "Verify recovery code", description = "Validates the 8-character email code and returns a token to reset the password.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Code Validated Successfully",
+                            content = { @Content(mediaType = "application/json", schema = @Schema(implementation = VerifyCodeResponse.class)) }),
+                    @ApiResponse(responseCode = "400", description = "Bad Request (Invalid or expired code)"),
+                    @ApiResponse(responseCode = "404", description = "User Not Found")
+            })
+    @PostMapping("/verify-code")
+    public ResponseEntity<VerifyCodeResponse> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
+        return ResponseEntity.ok(authService.verifyResetCode(request.email(), request.code()));
     }
 }

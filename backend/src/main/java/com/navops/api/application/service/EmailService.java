@@ -1,26 +1,53 @@
 package com.navops.api.application.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class EmailService {
 
-    // Comentado para el próximo sprint. Ya preparado para usarse nativamente.
-    // private final JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
 
-    public void sendPasswordRecoveryEmail(String toEmail, String resetToken) {
-        // En un escenario real, cargaríamos una plantilla HTML y enviaríamos el mail vía JavaMailSender
-        String urlRecuperacion = "http://localhost:5173/reset-password?token=" + resetToken;
-        
-        log.info("===============================================================");
-        log.info("[MOCK MAIL SERVICE] Se ha simulado el envío de un correo.");
-        log.info("Destinatario: {}", toEmail);
-        log.info("Asunto: Recuperación de Contraseña - NavOps");
-        log.info("Cuerpo del mensaje: Has solicitado recuperar tu contraseña.");
-        log.info("Enlace de recuperación: {}", urlRecuperacion);
-        log.info("===============================================================");
+    @Value("${spring.mail.username}")
+    private String fromEmail;
+
+    public void sendPasswordRecoveryEmail(String toEmail, String code) {
+        log.info("Generando correo de recuperación para: {}", toEmail);
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject("NavOps - Código de Recuperación de Contraseña");
+
+            Context context = new Context();
+            context.setVariable("email", toEmail);
+            context.setVariable("code", code);
+
+            String htmlContent = templateEngine.process("password-recovery", context);
+            helper.setText(htmlContent, true);
+
+            javaMailSender.send(mimeMessage);
+            log.info("Correo enviado exitosamente a: {}", toEmail);
+            log.info("FROM EMAIL CONFIG: {}", fromEmail);
+        } catch (MessagingException e) {
+            log.error("Error al enviar el correo a: {}", toEmail, e);
+            throw new RuntimeException("No se pudo enviar el correo de recuperación", e);
+        } catch (Exception e) {
+        log.error("ERROR REAL AL ENVIAR MAIL:", e);
+        throw new RuntimeException("No se pudo enviar el correo", e);
+    }
     }
 }

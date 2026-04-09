@@ -2,10 +2,15 @@ package com.navops.api.application.service;
 
 import com.navops.api.application.dto.request.LoginRequest;
 import com.navops.api.application.dto.response.LoginResponse;
+import com.navops.api.application.dto.response.VerifyCodeResponse;
 import com.navops.api.domain.entity.LoginAttempt;
+import com.navops.api.domain.entity.PasswordResetCode;
 import com.navops.api.domain.entity.User;
+import com.navops.api.infrastructure.exception.ExpiredResetCodeException;
+import com.navops.api.infrastructure.exception.InvalidResetCodeException;
 import com.navops.api.infrastructure.exception.UserNotFoundException;
 import com.navops.api.repository.LoginAttemptRepository;
+import com.navops.api.repository.PasswordResetCodeRepository;
 import com.navops.api.repository.UserRepository;
 import com.navops.api.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,8 +23,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +35,10 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final LoginAttemptRepository loginAttemptRepository;
+    private final PasswordResetCodeRepository passwordResetCodeRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
     private final HttpServletRequest request;
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
@@ -48,14 +57,14 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, loginRequest.password())
             );
-            
+
             // 3. Register success
             recordLoginAttempt(username, ipAddress, true);
 
             // 4. Generate Token and formulate response
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new BadCredentialsException("User not found after successful authentication"));
-                    
+
             String roleName = user.getRole().getName();
             String jwtToken = jwtService.generateToken(new HashMap<>(), user);
 
@@ -73,9 +82,9 @@ public class AuthService {
 
     private void checkLockoutStatus(String username, String ipAddress) {
         OffsetDateTime lockoutTimeWindow = OffsetDateTime.now().minusMinutes(LOCKOUT_MINUTES);
-        
+
         int failedAttempts = loginAttemptRepository.countByUsernameAndSuccessFalseAndAttemptTimeAfter(username, lockoutTimeWindow);
-        
+
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
             log.warn("User {} is temporarily blocked due to excessive failed login attempts", username);
             throw new LockedException("Demasiados intentos fallidos. Su cuenta está bloqueada temporalmente por " + LOCKOUT_MINUTES + " minutos.");
@@ -109,13 +118,62 @@ public class AuthService {
         };
     }
 
+    @Transactional
     public void forgotPassword(String email) {
         log.info("Iniciando proceso de recuperación de contraseña para: {}", email);
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-        String resetToken = jwtService.generatePasswordResetToken(user);
-        EmailService emailService = new EmailService();
-        emailService.sendPasswordRecoveryEmail(user.getEmail(), resetToken);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> {
+            log.warn("Intento de recuperación para correo inexistente: {}", email);
+            return new UserNotFoundException();
+        });
+
+        String code = generateSecureCode(8);
+        String formattedCode = formatCode(code);
+
+        PasswordResetCode resetCode = PasswordResetCode.builder()
+                .user(user)
+                .code(code)
+                .expiresAt(OffsetDateTime.now().plusMinutes(5))
+                .build();
+
+        passwordResetCodeRepository.save(resetCode);
+        emailService.sendPasswordRecoveryEmail(user.getEmail(), formattedCode);
         log.info("Correo enviado al usuario con id: {}", user.getId());
-        log.warn("Intento de recuperación para correo inexistente: {}", email);
+    }
+
+    @Transactional
+    public VerifyCodeResponse verifyResetCode(String email, String code) {
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        String rawCode = code.replace(" ", "").replace("-", "").toUpperCase();
+
+        PasswordResetCode resetCode = passwordResetCodeRepository.findFirstByUserAndUsedFalseOrderByCreatedAtDesc(user)
+                .orElseThrow(InvalidResetCodeException::new);
+
+        if (!resetCode.getCode().equals(rawCode)) {
+            throw new InvalidResetCodeException();
+        }
+
+        if (resetCode.getExpiresAt().isBefore(OffsetDateTime.now())) {
+            throw new ExpiredResetCodeException();
+        }
+
+        resetCode.setUsed(true);
+        passwordResetCodeRepository.save(resetCode);
+
+        // Generar un token temporal para que el usuario pueda cambiar su contraseña en el siguiente paso
+        String resetToken = jwtService.generatePasswordResetToken(user);
+        return new com.navops.api.application.dto.response.VerifyCodeResponse("Identidad validada exitosamente", resetToken);
+    }
+
+    private String generateSecureCode(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        SecureRandom random = new SecureRandom();
+        return random.ints(length, 0, chars.length())
+                .mapToObj(i -> String.valueOf(chars.charAt(i)))
+                .collect(Collectors.joining());
+    }
+
+    private String formatCode(String code) {
+        if (code == null || code.length() != 8) return code;
+        return code.substring(0, 4) + " - " + code.substring(4, 8);
     }
 }
