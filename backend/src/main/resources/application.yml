@@ -25,7 +25,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: "navops.soporte@gmail.com.ar"
+    username: "navops.soporte@gmail.com"
     password: "pffipftmhsofjywe"
     properties:
       mail:
