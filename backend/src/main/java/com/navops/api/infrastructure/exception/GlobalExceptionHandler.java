@@ -64,6 +64,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
+    @ExceptionHandler({InvalidResetCodeException.class, ExpiredResetCodeException.class})
+    public ResponseEntity<ErrorResponse> handleInvalidOrExpiredCode(RuntimeException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "Bad Request",
+                "El código ingresado no es válido o ha expirado",
+                HttpStatus.BAD_REQUEST.value(),
+                OffsetDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
         ErrorResponse response = new ErrorResponse(
