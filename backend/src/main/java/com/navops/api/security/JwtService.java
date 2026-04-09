@@ -40,6 +40,13 @@ public class JwtService {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
+    public String generatePasswordResetToken(UserDetails userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("reset", true);
+        long resetExpiration = 900000; // 15 minutos en milisegundos
+        return buildToken(extraClaims, userDetails, resetExpiration);
+    }
+
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder()
                 .claims(extraClaims)
