@@ -98,7 +98,7 @@ export const ForgotPassword: React.FC = () => {
         </div>
 
         {error && <div className={styles.globalError}>{error}</div>}
-        {success && ( <FeedbackModal message={success} onClose={() => { setSuccess(''); navigate('/login');}}/>)}
+        {success && ( <FeedbackModal message={success} onClose={() => { setSuccess(''); navigate('/verify-code', { state: { email } });}}/>)}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <Input
