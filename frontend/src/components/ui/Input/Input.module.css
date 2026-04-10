@@ -53,6 +53,20 @@
   color: var(--color-primary);
 }
 
+.rightIcon {
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.rightIcon:hover {
+  color: var(--color-primary);
+}
+
 .input {
   flex: 1;
   border: none;

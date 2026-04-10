@@ -4,7 +4,7 @@ import { Login } from './pages/Login/Login';
 import { DashboardPlaceholder } from './pages/Dashboard/DashboardPlaceholder';
 import { ForgotPassword } from './pages/ForgotPassword/ForgotPassword';
 import { VerifyToken } from './pages/VerifyToken/VerifyToken';
-import { ResetPasswordPlaceholder } from './pages/ResetPassword/ResetPasswordPlaceholder';
+import { ResetPassword } from './pages/ResetPassword/ResetPassword';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-code" element={<VerifyToken />} />
-        <Route path="/reset-password" element={<ResetPasswordPlaceholder />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );
