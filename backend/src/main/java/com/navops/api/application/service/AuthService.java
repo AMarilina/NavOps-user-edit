@@ -13,6 +13,7 @@ import com.navops.api.repository.LoginAttemptRepository;
 import com.navops.api.repository.PasswordResetCodeRepository;
 import com.navops.api.repository.UserRepository;
 import com.navops.api.security.JwtService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
     private final HttpServletRequest request;
+    private final PasswordEncoder passwordEncoder;
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final int LOCKOUT_MINUTES = 15;
@@ -162,6 +164,23 @@ public class AuthService {
         // Generar un token temporal para que el usuario pueda cambiar su contraseña en el siguiente paso
         String resetToken = jwtService.generatePasswordResetToken(user);
         return new com.navops.api.application.dto.response.VerifyCodeResponse("Identidad validada exitosamente", resetToken);
+    }
+
+    @Transactional
+    public void resetPassword(com.navops.api.application.dto.request.ResetPasswordRequest request) {
+        String username = jwtService.extractUsername(request.token());
+        Boolean isResetToken = jwtService.extractClaim(request.token(), claims -> claims.get("reset", Boolean.class));
+
+        if (Boolean.TRUE.equals(isResetToken)) {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(UserNotFoundException::new);
+
+            user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+            userRepository.save(user);
+            log.info("Contraseña restablecida exitosamente para {}", username);
+        } else {
+            throw new BadCredentialsException("Token inválido para esta operación");
+        }
     }
 
     private String generateSecureCode(int length) {

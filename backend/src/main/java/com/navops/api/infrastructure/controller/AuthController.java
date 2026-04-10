@@ -7,6 +7,7 @@ import com.navops.api.application.dto.response.LoginResponse;
 import com.navops.api.application.dto.request.VerifyCodeRequest;
 import com.navops.api.application.dto.response.VerifyCodeResponse;
 import com.navops.api.application.service.AuthService;
+import com.navops.api.application.dto.request.ResetPasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.NewFieldTypeMunger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,5 +66,17 @@ public class AuthController {
     @PostMapping("/verify-code")
     public ResponseEntity<VerifyCodeResponse> verifyCode(@Valid @RequestBody VerifyCodeRequest request) {
         return ResponseEntity.ok(authService.verifyResetCode(request.email(), request.code()));
+    }
+
+    @Operation(summary = "Reset password", description = "Resets the user password using a verified reset token.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password reset successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request (e.g. weak password)"),
+                    @ApiResponse(responseCode = "401", description = "Invalid token")
+            })
+    @PostMapping("/reset-password")
+    public ResponseEntity<ForgotPasswordResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok(new ForgotPasswordResponse("Tu contraseña fue actualizada con éxito"));
     }
 }

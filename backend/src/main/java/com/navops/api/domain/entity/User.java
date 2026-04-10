@@ -96,4 +96,8 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return isActive && (deletedAt == null);
     }
+
+    public void setPasswordHash(String encode) {
+        this.password = encode;
+    }
 }

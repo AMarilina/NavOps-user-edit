@@ -5,10 +5,11 @@ import styles from './Input.module.css';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   icon?: ReactNode;
+  rightIcon?: ReactNode;
   error?: string;
 }
 
-export const Input: React.FC<InputProps> = ({ label, icon, error, className, id, ...props }) => {
+export const Input: React.FC<InputProps> = ({ label, icon, rightIcon, error, className, id, ...props }) => {
   const [isFocused, setIsFocused] = useState(false);
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -33,6 +34,7 @@ export const Input: React.FC<InputProps> = ({ label, icon, error, className, id,
           }}
           {...props}
         />
+        {rightIcon && <div className={styles.rightIcon}>{rightIcon}</div>}
       </div>
       {error && <span className={styles.errorText}>{error}</span>}
     </div>
