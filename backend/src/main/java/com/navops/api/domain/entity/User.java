@@ -60,7 +60,6 @@ public class User implements UserDetails {
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
-    // --- UserDetails Methods ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

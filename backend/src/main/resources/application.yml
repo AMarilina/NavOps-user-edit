@@ -7,14 +7,12 @@ spring:
   
   datasource:
     url: jdbc:postgresql://localhost:5433/navops
-    # En tu docker-compose, el usuario era navops_user
     username: navops_user
     password: 2102
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      # Como usamos un script SQL completo (navops.sql) para gestionar la base de datos con triggers, ddl-auto va en validate
       ddl-auto: validate
     show-sql: true
     properties:
@@ -41,6 +39,8 @@ cors:
 # Documentación de la API (Swagger)
 springdoc:
   api-docs:
-    path: /api-docs
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+

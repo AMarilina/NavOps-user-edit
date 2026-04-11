@@ -51,21 +51,21 @@ public class AuthService {
         String ipAddress = getClientIp(request);
         String username = loginRequest.username();
 
-        // 1. Check if user/IP is blocked
+        //Comprueba si el usuario/IP está bloqueado
         checkLockoutStatus(username, ipAddress);
 
         try {
-            // 2. Validate credentials via Spring Security
+            // Validar credenciales mediante Spring Security
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, loginRequest.password())
             );
 
-            // 3. Register success
+            // Registro exitoso
             recordLoginAttempt(username, ipAddress, true);
 
-            // 4. Generate Token and formulate response
+            // Generar token y formular respuesta
             User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new BadCredentialsException("User not found after successful authentication"));
+                    .orElseThrow(() -> new BadCredentialsException("Usuario no encontrado tras autenticación exitosa"));
 
             String roleName = user.getRole().getName();
             String jwtToken = jwtService.generateToken(new HashMap<>(), user);
@@ -75,9 +75,9 @@ public class AuthService {
             return new LoginResponse(jwtToken, user.getId(), roleName, redirectUrl);
 
         } catch (BadCredentialsException ex) {
-            // Register failed attempt
+
             recordLoginAttempt(username, ipAddress, false);
-            log.warn("Failed login attempt for username: {} from IP: {}", username, ipAddress);
+            log.warn("Intento de inicio de sesión fallido para el nombre de usuario: {} desde la IP: {}", username, ipAddress);
             throw new BadCredentialsException("Usuario o contraseña incorrectos");
         }
     }
@@ -88,7 +88,7 @@ public class AuthService {
         int failedAttempts = loginAttemptRepository.countByUsernameAndSuccessFalseAndAttemptTimeAfter(username, lockoutTimeWindow);
 
         if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-            log.warn("User {} is temporarily blocked due to excessive failed login attempts", username);
+            log.warn("El usuario {} está bloqueado temporalmente debido a un número excesivo de intentos fallidos de inicio de sesión.", username);
             throw new LockedException("Demasiados intentos fallidos. Su cuenta está bloqueada temporalmente por " + LOCKOUT_MINUTES + " minutos.");
         }
     }
@@ -103,7 +103,7 @@ public class AuthService {
     }
 
     private String getClientIp(HttpServletRequest request) {
-        // MVP: Try to get from header, fallback to remote connection IP
+
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
             return xForwardedFor.split(",")[0].trim();

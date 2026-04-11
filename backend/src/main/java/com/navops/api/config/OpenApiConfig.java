@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                contact = @Contact(
-                        name = "NavOps Team",
-                        email = "support@navops.com"
-                ),
-                description = "OpenAPI documentation for NavOps Maritime Operations System",
-                title = "NavOps API Spec",
+                title = "NavOps API - Sistema de Gestión Marítima",
+                description = "Documentación técnica de los endpoints de NavOps para el control de navegación y logística.",
                 version = "1.0",
+                contact = @Contact(
+                        name = "NavOps",
+                        email = "navops.soporte@gmail.com"
+                ),
                 license = @License(
                         name = "Private License",
                         url = "https://navops.com"
@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 )
 @SecurityScheme(
         name = "bearerAuth",
-        description = "JWT auth description",
+        description = "Descripción de autenticación JWT",
         scheme = "bearer",
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
