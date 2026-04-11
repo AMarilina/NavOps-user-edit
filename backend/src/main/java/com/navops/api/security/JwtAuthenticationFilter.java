@@ -59,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            // Token parsing or validation failed, the user won't be authenticated
             logger.warn("JWT validation failed: " + e.getMessage());
         }
 

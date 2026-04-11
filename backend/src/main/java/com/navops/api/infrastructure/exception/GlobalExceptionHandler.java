@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        
+
         ErrorResponse response = new ErrorResponse(
                 "Bad Request",
                 message.isEmpty() ? "Complete todos los campos" : message,
@@ -87,12 +87,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EmailNotFoundException.class)
-    public ResponseEntity<?> handleEmailNotFound(EmailNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of(
-                        "error", "Not Found",
-                        "message", ex.getMessage(),
-                        "status", 404
-                ));
+    public ResponseEntity<ErrorResponse> handleEmailNotFound(EmailNotFoundException ex) {
+        ErrorResponse response = new ErrorResponse(
+                "Not Found",
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                OffsetDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 }
