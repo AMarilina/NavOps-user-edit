@@ -38,10 +38,10 @@ public class EmailService {
 
             String htmlContent = templateEngine.process("password-recovery", context);
             helper.setText(htmlContent, true);
-
+            log.info("FROM EMAIL CONFIG: {}", fromEmail);
             javaMailSender.send(mimeMessage);
             log.info("Correo enviado exitosamente a: {}", toEmail);
-            log.info("FROM EMAIL CONFIG: {}", fromEmail);
+
         } catch (MessagingException e) {
             log.error("Error al enviar el correo a: {}", toEmail, e);
             throw new RuntimeException("No se pudo enviar el correo de recuperación", e);

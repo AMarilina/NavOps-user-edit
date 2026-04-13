@@ -42,9 +42,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @Column(name = "avatar_url", length = 1000)
-    private String avatarUrl;
-
     @Version
     @Column(nullable = false)
     private Integer version;
