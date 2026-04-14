@@ -28,12 +28,4 @@ public class CloudinaryConfig {
         config.put("api_secret", apiSecret);
         return new Cloudinary(config);
     }
-
-   /* @Bean
-    public Cloudinary cloudinary() {
-        // Asume que la variable de entorno CLOUDINARY_URL está configurada
-        // El framework de Cloudinary automáticamente buscará "CLOUDINARY_URL"
-        // Si no, podemos pasarle un Map de configuracion manual pero por defecto es la mejor practica.
-        return new Cloudinary();
-    }dqt6c5PCKDaKFX6iek8XcNzPq9w*/
 }

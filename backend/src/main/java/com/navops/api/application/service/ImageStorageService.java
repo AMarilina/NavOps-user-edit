@@ -18,15 +18,15 @@ public class ImageStorageService {
     private final Cloudinary cloudinary;
 
     /**
-     * Uploads an image to Cloudinary in a specific folder.
+     * Sube una imagen a Cloudinary en una carpeta específica.
      *
-     * @param file the multipart file to upload
-     * @param folder the folder name in Cloudinary (e.g. "profile_pictures", "ships", "system_assets")
-     * @return the secure URL of the uploaded image
-     * @throws IOException if there's an error reading the file or communicating with Cloudinary
+     * @param file archivo multipart que se va a subir.
+     * @param folder de la carpeta en Cloudinary  (eJ: "profile_pictures", "ships", "system_assets")
+     * @return la URL segura de la imagen subida.
+     * @throws IOException  si se produce un error al leer el archivo o al comunicarse con Cloudinary.
      */
     public String uploadImage(MultipartFile file, String folder) throws IOException {
-        log.info("Uploading image to Cloudinary in folder: {}", folder);
+        log.info("Subiendo la imagen a Cloudinary en la carpeta: {}", folder);
         
         Map<String, Object> options = ObjectUtils.asMap(
                 "folder", folder,
@@ -38,23 +38,23 @@ public class ImageStorageService {
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
         
         String url = uploadResult.get("secure_url").toString();
-        log.info("Image uploaded successfully. URL: {}", url);
+        log.info("Imagen cargada correctamente. URL: {}", url);
         
         return url;
     }
 
     /**
-     * Deletes an image from Cloudinary using its public ID.
+     * Elimina una imagen de Cloudinary utilizando su ID público.
      *
-     * @param publicId the public ID of the image in Cloudinary
+     * @param publicId El identificador público de la imagen en Cloudinary.
      */
     public void deleteImage(String publicId) {
-        log.info("Deleting image from Cloudinary with publicId: {}", publicId);
+        log.info("Eliminando imagen de Cloudinary con publicId: {}", publicId);
         try {
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-            log.info("Image deleted successfully.");
+            log.info("Imagen eliminada con éxito.");
         } catch (IOException e) {
-            log.error("Failed to delete image with publicId: {}", publicId, e);
+            log.error("No se pudo eliminar la imagen con publicId: {}", publicId, e);
         }
     }
 }

@@ -15,12 +15,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/images")
 @RequiredArgsConstructor
-@Tag(name = "Images", description = "Endpoints for generic image uploads to Cloudinary")
+@Tag(name = "Imágenes", description = "EndPoint para la carga genérica de imágenes a Cloudinary")
 public class ImageController {
 
     private final ImageStorageService imageStorageService;
 
-    @Operation(summary = "Uploads an image to Cloudinary", description = "Expects a MultipartFile and a string for the folder name (e.g., 'profile_pictures', 'ships'). Returns the secure URL.")
+    @Operation(summary = "Sube una imagen a Cloudinary.", description = "Espera un archivo MultipartFile y una cadena para el nombre de la carpeta (por ejemplo, 'profile_pictures', 'ships', etc.). Devuelve la URL segura.")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UploadResponse> uploadImage(
             @RequestParam("file") MultipartFile file,
