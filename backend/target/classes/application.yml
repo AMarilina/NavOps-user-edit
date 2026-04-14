@@ -6,9 +6,9 @@ spring:
     name: navops-api
   
   datasource:
-    url: jdbc:postgresql://localhost:5433/navops
-    username: navops_user
-    password: 2102
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:navops}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:

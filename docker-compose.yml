@@ -5,9 +5,9 @@ services:
     image: postgres:16
     container_name: navops-db
     environment:
-      POSTGRES_USER: navops_user
-      POSTGRES_PASSWORD: 2102
-      POSTGRES_DB: navops
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5433:5432"
     volumes:
@@ -24,6 +24,11 @@ services:
     depends_on:
       - postgres
     environment:
+      #Servicio de PostgreSQL
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+
       #Servicio de Claudinary
       - CLOUDINARY_NAME=${CLOUDINARY_NAME}
       - CLOUDINARY_KEY=${CLOUDINARY_KEY}
@@ -34,7 +39,6 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
-
 
 volumes:
   navops-pgdata:
