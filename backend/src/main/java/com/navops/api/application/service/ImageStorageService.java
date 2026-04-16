@@ -17,6 +17,13 @@ public class ImageStorageService {
 
     private final Cloudinary cloudinary;
 
+    public String uploadImage(MultipartFile file, String folder) throws IOException {
+        log.warn("BYPASS: Cloudinary desactivado temporalmente. Devolviendo URL dummy.");
+
+        // Devolvemos una imagen de placeholder para que no rompa el front
+        return "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg";
+    }
+
     /**
      * Sube una imagen a Cloudinary en una carpeta específica.
      *
@@ -25,23 +32,26 @@ public class ImageStorageService {
      * @return la URL segura de la imagen subida.
      * @throws IOException  si se produce un error al leer el archivo o al comunicarse con Cloudinary.
      */
-    public String uploadImage(MultipartFile file, String folder) throws IOException {
+    /*public String uploadImage(MultipartFile file, String folder) throws IOException {
+
         log.info("Subiendo la imagen a Cloudinary en la carpeta: {}", folder);
-        
+
         Map<String, Object> options = ObjectUtils.asMap(
                 "folder", folder,
                 "use_filename", true,
                 "unique_filename", true,
-                "overwrite", false
+                "overwrite", false,
+                "upload_preset", "NavOps"
         );
 
         Map uploadResult = cloudinary.uploader().upload(file.getBytes(), options);
         
         String url = uploadResult.get("secure_url").toString();
         log.info("Imagen cargada correctamente. URL: {}", url);
-        
+
         return url;
-    }
+
+    }*/
 
     /**
      * Elimina una imagen de Cloudinary utilizando su ID público.

@@ -1,11 +1,11 @@
 -- ==========================================================
 -- SCRIPT DE BASE DE DATOS - NAVOPS ARCHITECTURE v1.1 (MVP)
--- Optimizada para Sincronización Offline (PWA / Dexie.js)
+-- Optimizada para Sincronizaci�n Offline (PWA / Dexie.js)
 -- ==========================================================
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Función maestra de automatización de actualizaciones (Vital para motor offline)
+-- Funci�n maestra de automatizaci�n de actualizaciones (Vital para motor offline)
 CREATE OR REPLACE FUNCTION trigger_set_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -14,11 +14,11 @@ RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- 1. CATÁLOGOS BASE
+-- 1. CAT�LOGOS BASE
 CREATE TABLE countries (
                            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                            country_name varchar(100) NOT NULL,
-                           iso_code char(2) NOT NULL UNIQUE,
+                           iso_code varchar(2) NOT NULL UNIQUE,
                            version integer NOT NULL DEFAULT 0,
                            created_at timestamp with time zone DEFAULT now(),
                            updated_at timestamp with time zone DEFAULT now(),
@@ -53,7 +53,6 @@ CREATE TABLE users (
                        password_hash varchar(255) NOT NULL,
                        is_active boolean NOT NULL DEFAULT true,
                        role_id uuid NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
-                       avatar_url varchar(1000),
                        version integer NOT NULL DEFAULT 0,
                        created_at timestamp with time zone DEFAULT now(),
                        updated_at timestamp with time zone DEFAULT now(),
@@ -106,6 +105,8 @@ CREATE TABLE people (
                         document_type varchar(50) NOT NULL,
                         document_number varchar(60) NOT NULL,
                         cuil varchar(50),
+                        nationality varchar(100),
+                        marital_status varchar(50),
                         gender varchar(20) NOT NULL,
                         birth_date date NOT NULL,
                         country_id uuid NOT NULL REFERENCES countries(id),
@@ -113,9 +114,13 @@ CREATE TABLE people (
                         mobile varchar(50),
                         home_phone varchar(50),
                         address_street varchar(200),
+                        address_number varchar(20),
+                        address_floor varchar(10),
+                        address_department varchar(20),
                         address_city varchar(100),
                         address_province varchar(100),
                         address_postal_code varchar(20),
+                        avatar_url varchar(1000),
                         user_id uuid UNIQUE REFERENCES users(id) ON DELETE SET NULL,
                         version integer NOT NULL DEFAULT 0,
                         created_at timestamp with time zone DEFAULT now(),
@@ -127,15 +132,17 @@ CREATE TABLE crew_members (
                               id uuid PRIMARY KEY REFERENCES people(id),
                               file_number varchar(50) NOT NULL UNIQUE,
                               maritime_book_number varchar(80) NOT NULL UNIQUE,
+                              navigation_role varchar(100) NOT NULL,
                               category varchar(80) NOT NULL,
                               hire_date date NOT NULL,
+                              status varchar(50) NOT NULL DEFAULT 'ACTIVE',
                               version integer NOT NULL DEFAULT 0,
                               created_at timestamp with time zone DEFAULT now(),
                               updated_at timestamp with time zone DEFAULT now(),
                               deleted_at timestamp with time zone
 );
 
--- 4. FLOTA MARÍTIMA
+-- 4. FLOTA MAR�TIMA
 CREATE TABLE ships (
                        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                        name varchar(150) NOT NULL,
@@ -213,7 +220,7 @@ CREATE TABLE maintenance (
                              deleted_at timestamp with time zone
 );
 
--- 5. OPERACIONES Y NAVEGACIÓN
+-- 5. OPERACIONES Y NAVEGACI�N
 CREATE TABLE ports (
                        id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                        name varchar(200) NOT NULL,
@@ -276,7 +283,7 @@ CREATE TABLE travel_plan_crew (
                                   UNIQUE(plan_id, crew_member_id)
 );
 
--- 6. CARGA Y LOGÍSTICA
+-- 6. CARGA Y LOG�STICA
 CREATE TABLE cargo_unit (
                             id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                             ship_id uuid NOT NULL REFERENCES ships(id) ON DELETE CASCADE,
@@ -312,7 +319,7 @@ CREATE TABLE product (
                          deleted_at timestamp with time zone
 );
 
--- 7. TELEMETRÍA E INCIDENTES
+-- 7. TELEMETR�A E INCIDENTES
 CREATE TABLE ship_positions (
                                 id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
                                 ship_id uuid NOT NULL REFERENCES ships(id) ON DELETE CASCADE,
@@ -386,7 +393,7 @@ ALTER TABLE incidents ADD CONSTRAINT chk_severity CHECK (severity IN ('INFO', 'W
 ALTER TABLE cargo_unit ADD CONSTRAINT chk_cargo_unit_status CHECK (status IN ('PENDING', 'LOADED', 'IN_TRANSIT', 'UNLOADED', 'DAMAGED'));
 
 -- ==========================================================
--- 9. ÍNDICES FOREIGN KEYS Y SYNC (Performance y Offline-First)
+-- 9. �NDICES FOREIGN KEYS Y SYNC (Performance y Offline-First)
 -- ==========================================================
 -- FK Indexes (Previenen Table Locks y aceleran JOINs)
 CREATE INDEX idx_users_role ON users(role_id);
@@ -415,7 +422,7 @@ CREATE INDEX idx_maintenance_ship_status ON maintenance(ship_id, status);
 CREATE INDEX idx_shippos_ship_time ON ship_positions(ship_id, recorded_at DESC);
 CREATE INDEX idx_tankreadings_tank_time ON tank_readings(tank_id, recorded_at DESC);
 
--- SYNC EXTREME PERFORMANCE: Índices en updated_at para Queries Offline (PWA -> DB)
+-- SYNC EXTREME PERFORMANCE: �ndices en updated_at para Queries Offline (PWA -> DB)
 CREATE INDEX idx_countries_updated_at ON countries(updated_at);
 CREATE INDEX idx_roles_updated_at ON roles(updated_at);
 CREATE INDEX idx_cargo_type_updated_at ON cargo_type(updated_at);
@@ -473,17 +480,17 @@ CREATE TRIGGER update_notif_modtime BEFORE UPDATE ON notifications FOR EACH ROW 
 -- 11. Carga Inicial de Datos (Mock Data para Login MVP)
 -- ==========================================================
 
--- Inserción de Roles Base
+-- Inserci�n de Roles Base
 INSERT INTO roles (id, name, description) VALUES
-('11111111-1111-1111-1111-111111111111', 'ADMIN', 'Administrador Global del Sistema'),
-('22222222-2222-2222-2222-222222222222', 'CHIEF_NAVIGATION', 'Jefe de Navegación (Dashboard Desktop)'),
-('33333333-3333-3333-3333-333333333333', 'CHIEF_OPERATIONS', 'Jefe de Operaciones (Check-in/out en Tablets)')
+                                              ('11111111-1111-1111-1111-111111111111', 'ADMIN', 'Administrador Global del Sistema'),
+                                              ('22222222-2222-2222-2222-222222222222', 'CHIEF_NAVIGATION', 'Jefe de Navegaci�n (Dashboard Desktop)'),
+                                              ('33333333-3333-3333-3333-333333333333', 'CHIEF_OPERATIONS', 'Jefe de Operaciones (Check-in/out en Tablets)')
     ON CONFLICT (name) DO NOTHING;
 
--- Inserción de Usuarios de Prueba (Password: admin123)
--- NOTA: Utilizamos la extensión pgcrypto para generar hashes de BCrypt compatibles nativamente con Spring Security.
+-- Inserci�n de Usuarios de Prueba (Password: admin123)
+-- NOTA: Utilizamos la extensi�n pgcrypto para generar hashes de BCrypt compatibles nativamente con Spring Security.
 INSERT INTO users (id, username, email, password_hash, role_id) VALUES
-('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin', 'ejemploprueba1112@gmail.com', crypt('admin123', gen_salt('bf')), '11111111-1111-1111-1111-111111111111'),
-('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', 'nav@navops.com', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
-('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', 'ops@navops.com', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
+                                                                    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin', 'ejemploprueba1112@gmail.com', crypt('admin123', gen_salt('bf')), '11111111-1111-1111-1111-111111111111'),
+                                                                    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', 'nav@navops.com', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
+                                                                    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', 'ops@navops.com', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
     ON CONFLICT (username) DO NOTHING;
