@@ -45,14 +45,30 @@ public class PersonnelController {
         log.info("Recibida petición para registrar personal documento: {}", request.generalInfo().documentNumber());
         try {
            // personnelService.registerPersonnel(request, image);
+            personnelService.registerPersonnel(request, null);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Personal registrado exitosamente."));
-        } catch (IllegalArgumentException e) {
-            log.error("Error al procesar la imagen del personal", e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Error al procesar la imagen enviada."));
-        }catch (Exception e) {
-            // Esto captura CUALQUIER otro error y te lo muestra en el log
-            log.error("ERROR NO CONTROLADO:", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error interno: " + e.getMessage()));
+        } catch (Exception e) {
+            log.error("ERROR AL REGISTRAR:", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno: " + e.getMessage()));
         }
     }
 }
+
+/*@PostMapping("/create-user")
+public ResponseEntity<Map<String, String>> registerPersonnel(
+        @RequestPart("data") @Valid PersonnelRegistrationRequest request
+) {
+    log.info("Recibida petición para registrar personal documento: {}", request.generalInfo().documentNumber());
+    try {
+        // LLAMADA AL SERVICIO (Sin la imagen por ahora)
+        personnelService.registerPersonnel(request, null);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Personal registrado exitosamente."));
+    } catch (Exception e) {
+        log.error("ERROR AL REGISTRAR:", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error interno: " + e.getMessage()));
+    }
+}*/

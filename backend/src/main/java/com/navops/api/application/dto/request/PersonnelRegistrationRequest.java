@@ -1,10 +1,8 @@
 package com.navops.api.application.dto.request;
 
-import com.navops.api.domain.enums.DocumentTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -29,16 +27,6 @@ public record PersonnelRegistrationRequest(
     @Builder
     public record GeneralInfo(
 
-            /*
-            * public record GeneralInfo(
-    // ...
-    @NotNull(message = "El tipo de documento es obligatorio")
-    DocumentType documentType, // <-- Cambiado de String a DocumentType
-
-    @NotNull(message = "El género es obligatorio")
-    Gender gender // <-- Cambiado de String a Gender
-) {}*/
-
             @Schema(example = "Maximiliano", requiredMode = Schema.RequiredMode.REQUIRED, description = "Nombre de la persona" )
             @NotBlank(message = "El nombre es obligatorio")
             String name,
@@ -49,7 +37,7 @@ public record PersonnelRegistrationRequest(
 
             @Schema(example = "DNI", requiredMode = Schema.RequiredMode.REQUIRED, description = "Tipo de documento de la persona" )
             @NotBlank(message = "El tipo de documento es obligatorio")
-            DocumentTypeEnum documentType,
+            String documentType,
 
             @Schema(example = "38235489", requiredMode = Schema.RequiredMode.REQUIRED, description = "Número de documento de la persona" )
             @NotBlank(message = "El número de documento es obligatorio")
@@ -133,10 +121,6 @@ public record PersonnelRegistrationRequest(
             @Schema(example = "2020-01-10", requiredMode = Schema.RequiredMode.REQUIRED, description = "Fecha de ingreso de la persona a la empresa" )
             @NotNull(message = "La fecha de ingreso es obligatoria")
             LocalDate hireDate,
-
-            @Schema(example = "LEG-002", requiredMode = Schema.RequiredMode.REQUIRED, description = "Legajo de la persona" )
-            @NotBlank(message = "El número de legajo es obligatorio")
-            String fileNumber,
 
             @Schema(example = "MAT-7777-C", requiredMode = Schema.RequiredMode.REQUIRED, description = "Número de libreta marítima única de la persona" )
             @NotBlank(message = "El número de libreta marítima es obligatorio")
