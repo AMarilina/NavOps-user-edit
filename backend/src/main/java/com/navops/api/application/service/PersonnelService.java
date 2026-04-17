@@ -7,6 +7,7 @@ import com.navops.api.domain.entity.Person;
 import com.navops.api.domain.entity.Role;
 import com.navops.api.domain.entity.User;
 import com.navops.api.domain.enums.CrewMemberStatusEnum;
+import com.navops.api.domain.enums.DocumentTypeEnum;
 import com.navops.api.domain.enums.GenderEnum;
 import com.navops.api.domain.enums.MaritalStatusEnum;
 import com.navops.api.infrastructure.exception.ResourceAlreadyExistsException;
@@ -34,8 +35,12 @@ public class PersonnelService {
     private final CountryRepository countryRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final ImageStorageService imageStorageService;
     private final PasswordEncoder passwordEncoder;
+    private String generateNextFileNumber() {
+        Long nextVal = crewMemberRepository.getNextFileSequenceValue();
+        // String.format con %05d rellena con ceros a la izquierda hasta llegar a 5 dígitos
+        return String.format("LG%05d", nextVal);
+    }
 
     @Transactional
     public void registerPersonnel(PersonnelRegistrationRequest request, MultipartFile image) throws IOException {
@@ -47,19 +52,19 @@ public class PersonnelService {
         if (personRepository.existsByEmail(request.contactInfo().email())) {
             throw new ResourceAlreadyExistsException("El correo electrónico ya se encuentra registrado.");
         }
-        if (crewMemberRepository.existsByFileNumber(request.laborData().fileNumber())) {
-            throw new ResourceAlreadyExistsException("El número de legajo ya se encuentra registrado.");
-        }
         if (crewMemberRepository.existsByMaritimeBookNumber(request.laborData().maritimeBookNumber())) {
             throw new ResourceAlreadyExistsException("El número de libreta marítima ya se encuentra registrado.");
         }
+
+        String automaticFileNumber = generateNextFileNumber();
+        log.info("Generado nuevo legajo automático: {}", automaticFileNumber);
 /*
         String avatarUrl = null;
         if (image != null && !image.isEmpty()) {
             avatarUrl = imageStorageService.uploadImage(image, "profile_pictures");
         }
 */
-
+        log.info("Buscando país con ID: {}", request.residenceInfo().countryId()); // Agregá esto
         Country country = countryRepository.findById(request.residenceInfo().countryId())
                 .orElseThrow(() -> new IllegalArgumentException("El ID del país provisto no existe."));
 
@@ -84,11 +89,11 @@ public class PersonnelService {
         Person person = Person.builder()
                 .fullName(request.generalInfo().name())
                 .surname(request.generalInfo().surname())
-                .documentType(request.generalInfo().documentType())
+                .documentType(DocumentTypeEnum.valueOf(request.generalInfo().documentType().toUpperCase()))
                 .documentNumber(request.generalInfo().documentNumber())
                 .cuil(request.generalInfo().cuil())
                 .nationality(request.generalInfo().nationality())
-                .maritalStatus(MaritalStatusEnum.valueOf(request.generalInfo().maritalStatus()))
+                .maritalStatus(MaritalStatusEnum.valueOf(request.generalInfo().maritalStatus().toUpperCase()))
                 .gender(GenderEnum.valueOf(request.generalInfo().gender()))
                 .birthDate(request.generalInfo().birthDate())
                 .country(country)
@@ -102,14 +107,16 @@ public class PersonnelService {
                 .user(savedUser)
                 .build();
 
+
+
         CrewMember crewMember = new CrewMember();
         crewMember.setPerson(person); // Vinculamos antes de tener ID
-        crewMember.setFileNumber(request.laborData().fileNumber());
+        crewMember.setFileNumber(automaticFileNumber);
         crewMember.setMaritimeBookNumber(request.laborData().maritimeBookNumber());
         crewMember.setNavigationRole(request.laborData().navigationRole());
         crewMember.setCategory(request.laborData().category());
         crewMember.setHireDate(request.laborData().hireDate());
-        crewMember.setStatus(CrewMemberStatusEnum.valueOf(request.laborData().status()));
+        crewMember.setStatus(CrewMemberStatusEnum.valueOf(request.laborData().status().toUpperCase()));
 
         // 3. LA CLAVE: Vinculamos el tripulante a la persona
         person.setCrewMember(crewMember);

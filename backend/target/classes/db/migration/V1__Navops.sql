@@ -475,22 +475,3 @@ CREATE TRIGGER update_shippos_modtime BEFORE UPDATE ON ship_positions FOR EACH R
 CREATE TRIGGER update_tankread_modtime BEFORE UPDATE ON tank_readings FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_incidents_modtime BEFORE UPDATE ON incidents FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
 CREATE TRIGGER update_notif_modtime BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();
-
--- ==========================================================
--- 11. Carga Inicial de Datos (Mock Data para Login MVP)
--- ==========================================================
-
--- Inserci�n de Roles Base
-INSERT INTO roles (id, name, description) VALUES
-                                              ('11111111-1111-1111-1111-111111111111', 'ADMIN', 'Administrador Global del Sistema'),
-                                              ('22222222-2222-2222-2222-222222222222', 'CHIEF_NAVIGATION', 'Jefe de Navegaci�n (Dashboard Desktop)'),
-                                              ('33333333-3333-3333-3333-333333333333', 'CHIEF_OPERATIONS', 'Jefe de Operaciones (Check-in/out en Tablets)')
-    ON CONFLICT (name) DO NOTHING;
-
--- Inserci�n de Usuarios de Prueba (Password: admin123)
--- NOTA: Utilizamos la extensi�n pgcrypto para generar hashes de BCrypt compatibles nativamente con Spring Security.
-INSERT INTO users (id, username, email, password_hash, role_id) VALUES
-                                                                    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'admin', 'ejemploprueba1112@gmail.com', crypt('admin123', gen_salt('bf')), '11111111-1111-1111-1111-111111111111'),
-                                                                    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'jefenav', 'nav@navops.com', crypt('admin123', gen_salt('bf')), '22222222-2222-2222-2222-222222222222'),
-                                                                    ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'jefeops', 'ops@navops.com', crypt('admin123', gen_salt('bf')), '33333333-3333-3333-3333-333333333333')
-    ON CONFLICT (username) DO NOTHING;
