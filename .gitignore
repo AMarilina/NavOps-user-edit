@@ -23,5 +23,11 @@
 hs_err_pid*
 replay_pid*
 
+# Environment variables
 .env
+backend/.env
 frontend/.env
+
+# Target
+target/
+backend/target/
